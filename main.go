@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	_ "image/png"
 	"log"
 )
 
@@ -23,7 +24,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-
+	screen.DrawImage(img, nil)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screeHeight int) {
