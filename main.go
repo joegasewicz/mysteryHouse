@@ -25,8 +25,8 @@ const (
 func init() {
 	var err error
 	hero = &Hero{
-		HasMoved:        false,
-		CurrentPosition: 10,
+		HasMoved: false,
+		X:        10,
 	}
 	heroImg, _, err = ebitenutil.NewImageFromFile("assets/hero-1.png")
 	mud, _, err = ebitenutil.NewImageFromFile("assets/mud.png")
@@ -55,8 +55,8 @@ func drawPlatform(screen *ebiten.Image, length int, yPos float64) {
 func drawHero(screen *ebiten.Image, xPos float64) {
 	heroPos := MUD_HEIGHT + HERO_HEIGHT
 	heroOptions = &ebiten.DrawImageOptions{}
-	hero.CurrentPosition += xPos
-	heroOptions.GeoM.Translate(hero.CurrentPosition, float64(SCREEN_HEIGHT-heroPos))
+	hero.X += xPos
+	heroOptions.GeoM.Translate(hero.X, float64(SCREEN_HEIGHT-heroPos))
 	screen.DrawImage(heroImg, heroOptions)
 }
 
@@ -75,6 +75,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			drawHero(screen, 1)
 		case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
 			drawHero(screen, -1)
+		case ebiten.IsKeyPressed(ebiten.KeySpace):
+			// jump
+			log.Println("Jump!")
 		default:
 			drawHero(screen, 0)
 		}
