@@ -29,12 +29,10 @@ func init() {
 		log.Fatal(err)
 	}
 	hero = &Hero{
-		X:          HERO_WIDTH,
-		Y:          MUD_HEIGHT,
-		HasMoved:   false,
-		EventType:  "",
-		JumpStartY: 0,
-		Img:        heroImg,
+		X:        HERO_WIDTH,
+		Y:        MUD_HEIGHT,
+		HasMoved: false,
+		Img:      heroImg,
 	}
 }
 
@@ -48,11 +46,11 @@ func (g *Game) Update() error {
 	} else {
 		switch true {
 		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-			hero.Jump(JUMP_DIRECTION_RIGHT)
+			hero.Jump.Start(JUMP_DIRECTION_RIGHT)
 		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-			hero.Jump(JUMP_DIRECTION_LEFT)
+			hero.Jump.Start(JUMP_DIRECTION_LEFT)
 		case ebiten.IsKeyPressed(ebiten.KeySpace):
-			hero.Jump(JUMP_DIRECTION_UP)
+			hero.Jump.Start(JUMP_DIRECTION_UP)
 		case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
 			hero.Run(1)
 		case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):

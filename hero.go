@@ -6,7 +6,6 @@ import (
 )
 
 const (
-	ACTION_TYPE_JUMP     = "ACTION_TYPE_JUMP"
 	JUMP_ASCEND          = "HERO_JUMP_ASCEND"
 	JUMP_DESCEND         = "HERO_JUMP_DESCEND"
 	JUMP_MAX_HEIGHT      = 50
@@ -16,56 +15,58 @@ const (
 )
 
 type Jump struct {
+	EventType string
+	StartY    float64
+	hero      *Hero
 }
 
-type Hero struct {
-	X          float64
-	Y          float64
-	HasMoved   bool
-	EventType  string
-	JumpStartY float64
-	Img        *ebiten.Image
-}
-
-func (h *Hero) Jump(direction string) {
+func (j *Jump) Start(direction string) {
 	log.Printf("Jump Direction: %s", direction)
 	//                 ceiling: +50
 	//      	   		    - -
 	//    			 	 -       -
 	// JumpStartY = h.Y -         - finish h.Y+50
 	// If the jump hasn't yet started then set the Y axis
-	if h.EventType != JUMP_ASCEND {
+	if j.EventType != JUMP_ASCEND {
 		// Start the jump
-		h.JumpStartY = h.Y
-		h.EventType = JUMP_ASCEND
+		j.StartY = j.hero.Y
+		j.EventType = JUMP_ASCEND
 	}
 	// Check if jump is ceiling height
-	if h.EventType == JUMP_ASCEND && h.reachedJumpCeiling() {
-		h.X -= 1
-		h.Y -= 1
+	if j.EventType == JUMP_ASCEND && j.reachedJumpCeiling() {
+		j.hero.X -= 1
+		j.hero.Y -= 1
 		// Check if we are ascending & jumping
-	} else if h.EventType == JUMP_ASCEND && h.JumpStartY < h.Y {
+	} else if j.EventType == JUMP_ASCEND && j.StartY < j.hero.Y {
 		if direction == JUMP_DIRECTION_UP {
 
 		}
-		h.X += 1
-		h.Y += 1
+		j.hero.X += 1
+		j.hero.Y += 1
 		// Check if jump is complete & reset
-	} else if h.EventType == JUMP_DESCEND && h.JumpStartY == h.Y {
+	} else if j.EventType == JUMP_DESCEND && j.StartY == j.hero.Y {
 		// End the jump
-		h.JumpStartY = 0
-		h.EventType = ""
+		j.StartY = 0
+		j.EventType = ""
 	}
+}
+
+func (j *Jump) reachedJumpCeiling() bool {
+	return j.StartY+JUMP_MAX_HEIGHT >= j.hero.Y
+}
+
+type Hero struct {
+	X        float64
+	Y        float64
+	HasMoved bool
+	Img      *ebiten.Image
+	Jump     *Jump
 }
 
 func (h *Hero) Run(xPos float64) {
 	heroYPos := MUD_HEIGHT + HERO_HEIGHT
 	h.Y = float64(SCREEN_HEIGHT - heroYPos)
 	h.X += xPos
-}
-
-func (h *Hero) reachedJumpCeiling() bool { // TODO Move to actions struct
-	return h.JumpStartY+JUMP_MAX_HEIGHT >= h.Y
 }
 
 func (h *Hero) LogPosition() {
