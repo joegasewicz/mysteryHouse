@@ -15,12 +15,15 @@ const (
 )
 
 type Jump struct {
-	EventType string
-	StartY    float64
-	hero      *Hero
+	Started bool
+	State   string
+	Type    string
+	StartY  float64
+	hero    *Hero
 }
 
 func (j *Jump) Start(direction string) {
+	j.Type = direction
 	log.Printf("Jump Direction: %s", direction)
 	if j.hero == nil {
 		panic("no Hero pointer passed to Jump Object")
@@ -30,32 +33,52 @@ func (j *Jump) Start(direction string) {
 	//    			 	 -       -
 	// JumpStartY = h.Y -         - finish h.Y+50
 	// If the jump hasn't yet started then set the Y axis
-	if j.EventType != JUMP_ASCEND {
+	if j.State == "" {
 		// Start the jump
 		j.StartY = j.hero.Y
-		j.EventType = JUMP_ASCEND
+		j.State = JUMP_ASCEND
 	}
-	// Check if jump is ceiling height
-	if j.EventType == JUMP_ASCEND && j.reachedJumpCeiling() {
-		j.hero.X -= 1
-		j.hero.Y -= 1
-		// Check if we are ascending & jumping
-	} else if j.EventType == JUMP_ASCEND && j.StartY < j.hero.Y {
-		if direction == JUMP_DIRECTION_UP {
-
+	// Check if jump is ceiling height then descend or just check we are descending
+	if j.State == JUMP_DESCEND || j.reachedJumpCeiling() {
+		log.Println("DESCENDING...")
+		if j.State == JUMP_ASCEND {
+			j.State = JUMP_DESCEND
 		}
-		j.hero.X += 1
-		j.hero.Y += 1
-		// Check if jump is complete & reset
-	} else if j.EventType == JUMP_DESCEND && j.StartY == j.hero.Y {
+		switch direction {
+		case JUMP_DIRECTION_UP:
+			j.hero.Y -= 1
+		case JUMP_DIRECTION_RIGHT:
+			//
+		case JUMP_DIRECTION_LEFT:
+			//
+		default:
+			//
+		}
+		// Check if we are ascending & jumping
+	} else if j.State == JUMP_ASCEND {
+		log.Println("ASCENDING...")
+		switch direction {
+		case JUMP_DIRECTION_UP:
+			j.hero.Y += 1
+		case JUMP_DIRECTION_RIGHT:
+			//
+		case JUMP_DIRECTION_LEFT:
+			//
+		default:
+			//
+		}
+
+	}
+	// Check if jump is complete & reset
+	if j.State == JUMP_DESCEND && j.StartY == j.hero.Y {
 		// End the jump
 		j.StartY = 0
-		j.EventType = ""
+		j.State = ""
 	}
 }
 
 func (j *Jump) reachedJumpCeiling() bool {
-	return j.StartY+JUMP_MAX_HEIGHT >= j.hero.Y
+	return j.hero.Y >= j.StartY+JUMP_MAX_HEIGHT
 }
 
 type Hero struct {
