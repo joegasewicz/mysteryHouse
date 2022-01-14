@@ -6,9 +6,12 @@ import (
 )
 
 const (
-	JUMP_ASCEND     = "HERO_JUMP_ASCEND"
-	JUMP_DESCEND    = "HERO_JUMP_DESCEND"
-	JUMP_MAX_HEIGHT = 50
+	JUMP_ASCEND          = "HERO_JUMP_ASCEND"
+	JUMP_DESCEND         = "HERO_JUMP_DESCEND"
+	JUMP_MAX_HEIGHT      = 50
+	JUMP_DIRECTION_UP    = "JUMP_DIRECTION_UP"
+	JUMP_DIRECTION_LEFT  = "JUMP_DIRECTION_LEFT"
+	JUMP_DIRECTION_RIGHT = "JUMP_DIRECTION_RIGHT"
 )
 
 type Hero struct {
@@ -20,7 +23,8 @@ type Hero struct {
 	Img        *ebiten.Image
 }
 
-func (h *Hero) Jump() {
+func (h *Hero) Jump(direction string) {
+	log.Printf("Jump Direction: %s", direction)
 	//                 ceiling: +50
 	//      	   		    - -
 	//    			 	 -       -
@@ -45,7 +49,6 @@ func (h *Hero) Jump() {
 		h.JumpStartY = 0
 		h.EventType = ""
 	}
-	//h.Options.GeoM.Translate(h.X, h.Y)
 }
 
 func (h *Hero) Run(xPos float64) {

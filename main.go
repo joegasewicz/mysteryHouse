@@ -47,12 +47,16 @@ func (g *Game) Update() error {
 		hero.HasMoved = true
 	} else {
 		switch true {
+		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+			hero.Jump(JUMP_DIRECTION_RIGHT)
+		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+			hero.Jump(JUMP_DIRECTION_LEFT)
+		case ebiten.IsKeyPressed(ebiten.KeySpace):
+			hero.Jump(JUMP_DIRECTION_UP)
 		case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
 			hero.Run(1)
 		case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
 			hero.Run(-1)
-		case ebiten.IsKeyPressed(ebiten.KeySpace):
-			hero.Jump()
 		default:
 			hero.Run(0)
 		}
@@ -79,7 +83,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(hero.X, hero.Y)
 	screen.DrawImage(heroImg, op)
-	hero.LogPosition()
+	//hero.LogPosition()
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screeHeight int) {
