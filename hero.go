@@ -17,11 +17,10 @@ type Hero struct {
 	HasMoved   bool
 	EventType  string
 	JumpStartY float64
-	Options    *ebiten.DrawImageOptions
 	Img        *ebiten.Image
 }
 
-func (h *Hero) Jump(screen *ebiten.Image) {
+func (h *Hero) Jump() {
 	//                 ceiling: +50
 	//      	   		    - -
 	//    			 	 -       -
@@ -46,15 +45,13 @@ func (h *Hero) Jump(screen *ebiten.Image) {
 		h.JumpStartY = 0
 		h.EventType = ""
 	}
-	h.Options.GeoM.Translate(h.X, h.Y)
+	//h.Options.GeoM.Translate(h.X, h.Y)
 }
 
-func (h *Hero) Run(screen *ebiten.Image, xPos float64) {
+func (h *Hero) Run(xPos float64) {
 	heroYPos := MUD_HEIGHT + HERO_HEIGHT
+	h.Y = float64(SCREEN_HEIGHT - heroYPos)
 	h.X += xPos
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(h.X, float64(SCREEN_HEIGHT-heroYPos))
-	screen.DrawImage(h.Img, op)
 }
 
 func (h *Hero) reachedJumpCeiling() bool { // TODO Move to actions struct

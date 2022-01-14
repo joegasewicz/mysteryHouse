@@ -10,7 +10,7 @@ import (
 var (
 	hero    *Hero
 	heroImg *ebiten.Image
-	mud     *ebiten.Image
+	mudImg  *ebiten.Image
 )
 
 const (
@@ -24,7 +24,7 @@ const (
 func init() {
 	var err error
 	heroImg, _, err = ebitenutil.NewImageFromFile("assets/hero-1.png")
-	mud, _, err = ebitenutil.NewImageFromFile("assets/mud.png")
+	mudImg, _, err = ebitenutil.NewImageFromFile("assets/mud.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +41,22 @@ func init() {
 type Game struct{}
 
 func (g *Game) Update() error {
+	// Run heroImg
+	if !hero.HasMoved {
+		hero.Run(50)
+		hero.HasMoved = true
+	} else {
+		switch true {
+		case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+			hero.Run(1)
+		case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+			hero.Run(-1)
+		case ebiten.IsKeyPressed(ebiten.KeySpace):
+			hero.Jump()
+		default:
+			hero.Run(0)
+		}
+	}
 	return nil
 }
 
@@ -50,31 +66,19 @@ func drawPlatform(screen *ebiten.Image, length int, yPos float64) {
 	op.GeoM.Translate(SCREEN_WIDTH, yPos)
 	for i := 1; i <= length; i++ {
 		op.GeoM.Translate(-8, 0)
-		screen.DrawImage(mud, op)
+		screen.DrawImage(mudImg, op)
 	}
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Run room #1
+	// Draw Room
 	drawPlatform(screen, 20, 150)
 	drawPlatform(screen, 40, 250)
 	drawPlatform(screen, 60, SCREEN_HEIGHT-8)
-	// Run heroImg
-	if !hero.HasMoved {
-		hero.Run(screen, 50)
-		hero.HasMoved = true
-	} else {
-		switch true {
-		case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-			hero.Run(screen, 1)
-		case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-			hero.Run(screen, -1)
-		case ebiten.IsKeyPressed(ebiten.KeySpace):
-			hero.Jump(screen)
-		default:
-			hero.Run(screen, 0)
-		}
-	}
+	// Draw Hero
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(hero.X, hero.Y)
+	screen.DrawImage(heroImg, op)
 	hero.LogPosition()
 }
 
