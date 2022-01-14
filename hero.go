@@ -22,14 +22,14 @@ type Jump struct {
 
 func (j *Jump) Start(direction string) {
 	log.Printf("Jump Direction: %s", direction)
+	if j.hero == nil {
+		panic("no Hero pointer passed to Jump Object")
+	}
 	//                 ceiling: +50
 	//      	   		    - -
 	//    			 	 -       -
 	// JumpStartY = h.Y -         - finish h.Y+50
 	// If the jump hasn't yet started then set the Y axis
-	if j.hero == nil {
-		panic("no Hero pointer passed to Jump Object")
-	}
 	if j.EventType != JUMP_ASCEND {
 		// Start the jump
 		j.StartY = j.hero.Y
