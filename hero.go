@@ -5,15 +5,6 @@ import (
 	"log"
 )
 
-const (
-	JUMP_ASCEND          = "HERO_JUMP_ASCEND"
-	JUMP_DESCEND         = "HERO_JUMP_DESCEND"
-	JUMP_MAX_HEIGHT      = 50
-	JUMP_DIRECTION_UP    = "JUMP_DIRECTION_UP"
-	JUMP_DIRECTION_LEFT  = "JUMP_DIRECTION_LEFT"
-	JUMP_DIRECTION_RIGHT = "JUMP_DIRECTION_RIGHT"
-)
-
 type Hero struct {
 	X          float64
 	Y          float64
