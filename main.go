@@ -33,7 +33,12 @@ func init() {
 		Y:        MUD_HEIGHT,
 		HasMoved: false,
 		Img:      heroImg,
+		Jump: &Jump{
+			EventType: "",
+			StartY:    0,
+		},
 	}
+	hero.Jump.hero = hero
 }
 
 type Game struct{}
