@@ -5,6 +5,19 @@ import (
 	"log"
 )
 
+const (
+	ACTION_TYPE_JUMP     = "ACTION_TYPE_JUMP"
+	JUMP_ASCEND          = "HERO_JUMP_ASCEND"
+	JUMP_DESCEND         = "HERO_JUMP_DESCEND"
+	JUMP_MAX_HEIGHT      = 50
+	JUMP_DIRECTION_UP    = "JUMP_DIRECTION_UP"
+	JUMP_DIRECTION_LEFT  = "JUMP_DIRECTION_LEFT"
+	JUMP_DIRECTION_RIGHT = "JUMP_DIRECTION_RIGHT"
+)
+
+type Jump struct {
+}
+
 type Hero struct {
 	X          float64
 	Y          float64
@@ -21,7 +34,7 @@ func (h *Hero) Jump(direction string) {
 	//    			 	 -       -
 	// JumpStartY = h.Y -         - finish h.Y+50
 	// If the jump hasn't yet started then set the Y axis
-	if h.EventType != JUMP_ASCEND && h.EventType != JUMP_ASCEND {
+	if h.EventType != JUMP_ASCEND {
 		// Start the jump
 		h.JumpStartY = h.Y
 		h.EventType = JUMP_ASCEND
@@ -32,6 +45,9 @@ func (h *Hero) Jump(direction string) {
 		h.Y -= 1
 		// Check if we are ascending & jumping
 	} else if h.EventType == JUMP_ASCEND && h.JumpStartY < h.Y {
+		if direction == JUMP_DIRECTION_UP {
+
+		}
 		h.X += 1
 		h.Y += 1
 		// Check if jump is complete & reset
