@@ -40,40 +40,58 @@ func (j *Jump) Start(direction string) {
 	}
 	// Check if jump is ceiling height then descend or just check we are descending
 	if j.State == JUMP_DESCEND || j.reachedJumpCeiling() {
-		log.Println("DESCENDING...")
-		if j.State == JUMP_ASCEND {
-			j.State = JUMP_DESCEND
-		}
-		switch direction {
-		case JUMP_DIRECTION_UP:
-			j.hero.Y -= 1
-		case JUMP_DIRECTION_RIGHT:
-			//
-		case JUMP_DIRECTION_LEFT:
-			//
-		default:
-			//
-		}
+		j.descend(direction)
 		// Check if we are ascending & jumping
 	} else if j.State == JUMP_ASCEND {
-		log.Println("ASCENDING...")
-		switch direction {
-		case JUMP_DIRECTION_UP:
-			j.hero.Y += 1
-		case JUMP_DIRECTION_RIGHT:
-			//
-		case JUMP_DIRECTION_LEFT:
-			//
-		default:
-			//
-		}
+		j.ascend(direction)
+	}
 
+}
+
+func (j *Jump) Continue(direction string) {
+	// Check if jump is ceiling height then descend or just check we are descending
+	if j.State == JUMP_DESCEND || j.reachedJumpCeiling() {
+		j.descend(direction)
+		// Check if we are ascending & jumping
+	} else if j.State == JUMP_ASCEND {
+		j.ascend(direction)
 	}
 	// Check if jump is complete & reset
 	if j.State == JUMP_DESCEND && j.StartY == j.hero.Y {
 		// End the jump
 		j.StartY = 0
 		j.State = ""
+	}
+}
+
+func (j *Jump) ascend(direction string) {
+	log.Println("ASCENDING...")
+	switch direction {
+	case JUMP_DIRECTION_UP:
+		j.hero.Y += 1
+	case JUMP_DIRECTION_RIGHT:
+		//
+	case JUMP_DIRECTION_LEFT:
+		//
+	default:
+		//
+	}
+}
+
+func (j *Jump) descend(direction string) {
+	log.Println("DESCENDING...")
+	if j.State == JUMP_ASCEND {
+		j.State = JUMP_DESCEND
+	}
+	switch direction {
+	case JUMP_DIRECTION_UP:
+		j.hero.Y -= 1
+	case JUMP_DIRECTION_RIGHT:
+		//
+	case JUMP_DIRECTION_LEFT:
+		//
+	default:
+		//
 	}
 }
 

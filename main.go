@@ -49,25 +49,32 @@ func (g *Game) Update() error {
 		hero.Run(50)
 		hero.HasMoved = true
 	} else {
-		// If the hero is jumping then block key inputs
-		if hero.Jump.State != "" {
-			hero.
-		} else {
-			// Key Inputs
-			switch true {
-			case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+		// Key Inputs
+		switch true {
+		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+			if hero.Jump.State != "" {
+				hero.Jump.Continue(JUMP_DIRECTION_UP)
+			} else {
 				hero.Jump.Start(JUMP_DIRECTION_RIGHT)
-			case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-				hero.Jump.Start(JUMP_DIRECTION_LEFT)
-			case ebiten.IsKeyPressed(ebiten.KeySpace):
-				hero.Jump.Start(JUMP_DIRECTION_UP)
-			case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-				hero.Run(1)
-			case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-				hero.Run(-1)
-			default:
-				hero.Run(0)
 			}
+		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+			if hero.Jump.State != "" {
+				hero.Jump.Continue(JUMP_DIRECTION_LEFT)
+			} else {
+				hero.Jump.Start(JUMP_DIRECTION_LEFT)
+			}
+		case ebiten.IsKeyPressed(ebiten.KeySpace):
+			if hero.Jump.State != "" {
+				hero.Jump.Continue(JUMP_DIRECTION_UP)
+			} else {
+				hero.Jump.Start(JUMP_DIRECTION_UP)
+			}
+		case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+			hero.Run(1)
+		case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+			hero.Run(-1)
+		default:
+			hero.Run(0)
 		}
 	}
 	return nil
