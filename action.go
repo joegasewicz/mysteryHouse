@@ -3,6 +3,7 @@ package main
 import "log"
 
 const (
+	ACTION_TYPE_JUMP     = "ACTION_TYPE_JUMP"
 	JUMP_ASCEND          = "HERO_JUMP_ASCEND"
 	JUMP_DESCEND         = "HERO_JUMP_DESCEND"
 	JUMP_MAX_HEIGHT      = 50
@@ -10,6 +11,10 @@ const (
 	JUMP_DIRECTION_LEFT  = "JUMP_DIRECTION_LEFT"
 	JUMP_DIRECTION_RIGHT = "JUMP_DIRECTION_RIGHT"
 )
+
+type IAction interface {
+	Init()
+}
 
 type Action struct {
 	MaxHeight float64
@@ -21,7 +26,8 @@ type Action struct {
 }
 
 // Jump e Is the entity type (hero, enemies etc.)
-func (a *Action) Jump(e Hero, direction string) (float64, float64) {
+// Actions always return X, Y postions for entity
+func (a *Action) Init(actionType string, eventType string, direction string, entityY float64) (float64, float64) {
 	log.Printf("Jump Direction: %s", direction)
 	var X, Y float64
 	//                 ceiling: +50
@@ -29,24 +35,28 @@ func (a *Action) Jump(e Hero, direction string) (float64, float64) {
 	//    			 	 -       -
 	// JumpStartY = h.Y -         - finish h.Y+50
 	// If the jump hasn't yet started then set the Y axis
-	if e.EventType != JUMP_ASCEND && e.EventType != JUMP_ASCEND {
+	if eventType != JUMP_ASCEND && eventType != JUMP_ASCEND {
 		// Start the jump
-		a.StartY = e.Y
+		a.StartY = entityY
 		a.Type = JUMP_ASCEND
 	}
 	// Check if jump is ceiling height
-	if e.EventType == JUMP_ASCEND && e.reachedJumpCeiling() {
+	if eventType == JUMP_ASCEND && a.reachedJumpCeiling(entityY) {
 		X -= 1
 		Y -= 1
 		// Check if we are ascending & jumping
-	} else if e.EventType == JUMP_ASCEND && e.JumpStartY < e.Y {
+	} else if eventType == JUMP_ASCEND && a.StartY < entityY {
 		X += 1
 		Y += 1
 		// Check if jump is complete & reset
-	} else if e.EventType == JUMP_DESCEND && e.JumpStartY == e.Y {
+	} else if eventType == JUMP_DESCEND && a.StartY == entityY {
 		// End the jump
-		e.JumpStartY = 0
-		e.EventType = ""
+		a.StartY = 0
+		eventType = ""
 	}
 	return X, Y
+}
+
+func (a *Action) reachedJumpCeiling(entityY float64) bool { // TODO Move to actions struct
+	return a.StartY+JUMP_MAX_HEIGHT >= entityY
 }
