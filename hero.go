@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"log"
 )
@@ -8,7 +9,7 @@ import (
 const (
 	JUMP_ASCEND          = "HERO_JUMP_ASCEND"
 	JUMP_DESCEND         = "HERO_JUMP_DESCEND"
-	JUMP_MAX_HEIGHT      = 50
+	JUMP_MAX_HEIGHT      = 40
 	JUMP_DIRECTION_UP    = "JUMP_DIRECTION_UP"
 	JUMP_DIRECTION_LEFT  = "JUMP_DIRECTION_LEFT"
 	JUMP_DIRECTION_RIGHT = "JUMP_DIRECTION_RIGHT"
@@ -16,15 +17,21 @@ const (
 
 type Jump struct {
 	Started bool
-	State   string
-	Type    string
-	StartY  float64
-	hero    *Hero
+	// State:
+	// - JUMP_ASCEND
+	// - JUMP_DESCEND
+	State string
+	// Type:
+	// - JUMP_DIRECTION_UP
+	// - JUMP_DIRECTION_LEFT
+	// - JUMP_DIRECTION_RIGHT
+	Type   string
+	StartY float64
+	hero   *Hero
 }
 
 func (j *Jump) Start(direction string) {
 	j.Type = direction
-	log.Printf("Jump Direction: %s", direction)
 	if j.hero == nil {
 		panic("no Hero pointer passed to Jump Object")
 	}
@@ -40,21 +47,22 @@ func (j *Jump) Start(direction string) {
 	}
 	// Check if jump is ceiling height then descend or just check we are descending
 	if j.State == JUMP_DESCEND || j.reachedJumpCeiling() {
-		j.descend(direction)
+		j.descend()
 		// Check if we are ascending & jumping
 	} else if j.State == JUMP_ASCEND {
-		j.ascend(direction)
+		j.ascend()
 	}
 
 }
 
-func (j *Jump) Continue(direction string) {
+func (j *Jump) Continue() {
 	// Check if jump is ceiling height then descend or just check we are descending
 	if j.State == JUMP_DESCEND || j.reachedJumpCeiling() {
-		j.descend(direction)
+		j.descend()
 		// Check if we are ascending & jumping
-	} else if j.State == JUMP_ASCEND {
-		j.ascend(direction)
+	} else if j.State == JUMP_ASCEND && !j.reachedJumpCeiling() {
+		fmt.Printf("here----> %v", j.reachedJumpCeiling())
+		j.ascend()
 	}
 	// Check if jump is complete & reset
 	if j.State == JUMP_DESCEND && j.StartY == j.hero.Y {
@@ -64,26 +72,8 @@ func (j *Jump) Continue(direction string) {
 	}
 }
 
-func (j *Jump) ascend(direction string) {
-	log.Println("ASCENDING...")
-	switch direction {
-	case JUMP_DIRECTION_UP:
-		j.hero.Y += 1
-	case JUMP_DIRECTION_RIGHT:
-		//
-	case JUMP_DIRECTION_LEFT:
-		//
-	default:
-		//
-	}
-}
-
-func (j *Jump) descend(direction string) {
-	log.Println("DESCENDING...")
-	if j.State == JUMP_ASCEND {
-		j.State = JUMP_DESCEND
-	}
-	switch direction {
+func (j *Jump) ascend() {
+	switch j.Type {
 	case JUMP_DIRECTION_UP:
 		j.hero.Y -= 1
 	case JUMP_DIRECTION_RIGHT:
@@ -95,8 +85,25 @@ func (j *Jump) descend(direction string) {
 	}
 }
 
+func (j *Jump) descend() {
+	log.Println("DESCENDING...")
+	if j.State == JUMP_ASCEND {
+		j.State = JUMP_DESCEND
+	}
+	switch j.Type {
+	case JUMP_DIRECTION_UP:
+		j.hero.Y += 1
+	case JUMP_DIRECTION_RIGHT:
+		//
+	case JUMP_DIRECTION_LEFT:
+		//
+	default:
+		//
+	}
+}
+
 func (j *Jump) reachedJumpCeiling() bool {
-	return j.hero.Y >= j.StartY+JUMP_MAX_HEIGHT
+	return j.hero.Y <= j.StartY-JUMP_MAX_HEIGHT
 }
 
 type Hero struct {
