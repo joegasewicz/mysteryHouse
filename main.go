@@ -34,8 +34,8 @@ func init() {
 		HasMoved: false,
 		Img:      heroImg,
 		Jump: &Jump{
-			EventType: "",
-			StartY:    0,
+			State:  "",
+			StartY: 0,
 		},
 	}
 	hero.Jump.hero = hero
@@ -44,24 +44,29 @@ func init() {
 type Game struct{}
 
 func (g *Game) Update() error {
-	// Run heroImg
+	// Hero
 	if !hero.HasMoved {
 		hero.Run(50)
 		hero.HasMoved = true
 	} else {
-		switch true {
-		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-			hero.Jump.Start(JUMP_DIRECTION_RIGHT)
-		case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-			hero.Jump.Start(JUMP_DIRECTION_LEFT)
-		case ebiten.IsKeyPressed(ebiten.KeySpace):
-			hero.Jump.Start(JUMP_DIRECTION_UP)
-		case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
-			hero.Run(1)
-		case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
-			hero.Run(-1)
-		default:
-			hero.Run(0)
+		// Key Inputs
+		if hero.Jump.State != "" {
+			hero.Jump.Continue()
+		} else {
+			switch true {
+			case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+				hero.Jump.Start(JUMP_DIRECTION_RIGHT)
+			case ebiten.IsKeyPressed(ebiten.KeySpace) && ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+				hero.Jump.Start(JUMP_DIRECTION_LEFT)
+			case ebiten.IsKeyPressed(ebiten.KeySpace):
+				hero.Jump.Start(JUMP_DIRECTION_UP)
+			case ebiten.IsKeyPressed(ebiten.KeyArrowRight):
+				hero.Run(1)
+			case ebiten.IsKeyPressed(ebiten.KeyArrowLeft):
+				hero.Run(-1)
+			default:
+				hero.Run(0)
+			}
 		}
 	}
 	return nil
