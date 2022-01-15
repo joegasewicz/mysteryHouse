@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"log"
 )
@@ -61,7 +60,6 @@ func (j *Jump) Continue() {
 		j.descend()
 		// Check if we are ascending & jumping
 	} else if j.State == JUMP_ASCEND && !j.reachedJumpCeiling() {
-		fmt.Printf("here----> %v", j.reachedJumpCeiling())
 		j.ascend()
 	}
 	// Check if jump is complete & reset
