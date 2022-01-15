@@ -75,11 +75,13 @@ func (j *Jump) ascend() {
 	case JUMP_DIRECTION_UP:
 		j.hero.Y -= 1
 	case JUMP_DIRECTION_RIGHT:
-		//
+		j.hero.Y -= 1
+		j.hero.X += 1
 	case JUMP_DIRECTION_LEFT:
-		//
+		j.hero.Y -= 1
+		j.hero.X -= 1
 	default:
-		//
+		panic("Jump type doesn't matter")
 	}
 }
 
@@ -92,11 +94,13 @@ func (j *Jump) descend() {
 	case JUMP_DIRECTION_UP:
 		j.hero.Y += 1
 	case JUMP_DIRECTION_RIGHT:
-		//
+		j.hero.Y += 1
+		j.hero.X += 1
 	case JUMP_DIRECTION_LEFT:
-		//
+		j.hero.Y += 1
+		j.hero.X -= 1
 	default:
-		//
+		panic("Jump type doesn't matter")
 	}
 }
 
