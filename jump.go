@@ -117,7 +117,7 @@ type Hero struct {
 }
 
 func (h *Hero) Run(xPos float64) {
-	heroYPos := MUD_HEIGHT + HERO_HEIGHT
+	heroYPos := PLATFORM_HEIGHT + HERO_HEIGHT
 	h.Y = float64(SCREEN_HEIGHT - heroYPos)
 	h.X += xPos
 }
