@@ -1,36 +1,42 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"image"
 	_ "image/png"
 	"log"
 )
 
 var (
-	hero    *Hero
-	heroImg *ebiten.Image
-	mudImg  *ebiten.Image
+	hero       *Hero
+	heroImg    *ebiten.Image
+	mudImg     *ebiten.Image
+	tilesImage *ebiten.Image
 )
 
 const (
-	SCREEN_WIDTH  = 320 * 1.5
-	SCREEN_HEIGHT = 240 * 1.5
-	HERO_HEIGHT   = 32
-	HERO_WIDTH    = 9
-	MUD_HEIGHT    = 8
+	SCREEN_WIDTH    = 320
+	SCREEN_HEIGHT   = 256
+	HERO_HEIGHT     = 32
+	HERO_WIDTH      = 9
+	PLATFORM_HEIGHT = 32
+	TILE_SIZE       = 32
+	TILE_X_NUM      = 10
 )
 
 func init() {
 	var err error
 	heroImg, _, err = ebitenutil.NewImageFromFile("assets/hero-1.png")
 	mudImg, _, err = ebitenutil.NewImageFromFile("assets/mud.png")
+	tilesImage, _, err = ebitenutil.NewImageFromFile("assets/tile_map.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	hero = &Hero{
 		X:        HERO_WIDTH,
-		Y:        MUD_HEIGHT,
+		Y:        PLATFORM_HEIGHT,
 		HasMoved: false,
 		Img:      heroImg,
 		Jump: &Jump{
@@ -41,7 +47,9 @@ func init() {
 	hero.Jump.hero = hero
 }
 
-type Game struct{}
+type Game struct {
+	layers [][]int
+}
 
 func (g *Game) Update() error {
 	// Hero
@@ -72,26 +80,27 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func drawPlatform(screen *ebiten.Image, length int, yPos float64) {
-	op := &ebiten.DrawImageOptions{}
-	// Starting position
-	op.GeoM.Translate(SCREEN_WIDTH, yPos)
-	for i := 1; i <= length; i++ {
-		op.GeoM.Translate(-8, 0)
-		screen.DrawImage(mudImg, op)
-	}
-}
-
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Draw Room
-	drawPlatform(screen, 20, 150)
-	drawPlatform(screen, 40, 250)
-	drawPlatform(screen, 60, SCREEN_HEIGHT-8)
-	// Draw Hero
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(hero.X, hero.Y)
-	screen.DrawImage(heroImg, op)
+	// ------------------------------
+	// Tiles
+	const xNum = SCREEN_WIDTH / TILE_SIZE
+	for _, l := range g.layers {
+		for i, t := range l {
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64((i%xNum)*TILE_SIZE), float64((i/xNum)*TILE_SIZE))
+
+			sx := (t % TILE_X_NUM) * TILE_SIZE
+			sy := (t / TILE_X_NUM) * TILE_SIZE
+			screen.DrawImage(tilesImage.SubImage(image.Rect(sx, sy, sx+TILE_SIZE, sy+TILE_SIZE)).(*ebiten.Image), op)
+		}
+	}
+	// ------------------------------
+	// Hero
+	heroOptions := &ebiten.DrawImageOptions{}
+	heroOptions.GeoM.Translate(hero.X, hero.Y)
+	screen.DrawImage(heroImg, heroOptions)
 	//hero.LogPosition()
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screeHeight int) {
@@ -99,9 +108,24 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screeHeight
 }
 
 func main() {
+	g := &Game{
+		layers: [][]int{
+			{
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				1, 1, 1, 1, 0, 1, 1, 3, 1, 1,
+				0, 0, 0, 0, 0, 0, 0, 2, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 2, 0, 0,
+				1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			},
+		},
+	}
+
 	ebiten.SetWindowSize(SCREEN_WIDTH*2, SCREEN_HEIGHT*2)
 	ebiten.SetWindowTitle("Mystery House")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
 }
